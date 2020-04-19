@@ -1,12 +1,15 @@
 import requests
 import json
 import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 s = 1236472051807 / 1000.0
 d = datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')
 print(d)
 
-numdays = 30
+numdays = 60
 base = datetime.datetime.today()
 date_list = [base + datetime.timedelta(days=x) for x in range(numdays)]
 date_lst = []
@@ -99,9 +102,16 @@ for d in date_lst:
     modena_dct = json.loads(modena_txt)
     i = date_lst.index(d)
     for trip in url_dct[i]:
-        print(trip.get("minprice"))
-        price.append(float(trip.get("minprice")))
+        price_trip = trip.get("minprice")
+        print(price_trip)
+        if price_trip != 0.0:
+            price.append(price_trip)
 
 response = requests.get(train_solution_url("BOLOGNA%20CENTRALE", "ROMA%20TERMINI", date="21/04/2020", time="20"))
 print(response.text)
-print("min" + str(min(price)))
+print("min " + str(min(price)))
+print(price)
+
+fig, ax = plt.subplots()  # Create a figure containing a single axes.
+ax.plot(range(0,len(price)),price)  # Plot some data on the axes.
+plt.show()
