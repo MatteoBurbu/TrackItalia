@@ -4,7 +4,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 
-s = 1587613200000 / 1000.0
+s = 1587578460000 / 1000.0
 d = datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%d %H:%M:%S.%f')
 print(d)
 
@@ -116,30 +116,36 @@ ax.plot(range(0,len(price)),price)  # Plot some data on the axes.
 
 n = "0"
 trip = []
+trip_price = []
 i = 0
 while i == 0:
-    roma = requests.get(train_solution_url("ROMA%20TIBURTINA","ROMA%20TERMINI",offset=n,date="22/04/2020",time="10",is_regional="true",is_frecce="false"))
+    roma = requests.get(train_solution_url("ROMA%20TIBURTINA", "ROMA%20TERMINI", offset=n, date="22/04/2020", time="10", is_regional="true", is_frecce="false"))
     print(roma.json())
     roma_txt = roma.text
     roma_dct = json.loads(roma_txt)
     trip.append(roma_dct)
     departure_date = []
     if len(roma_dct) == 5:
-        for dct in roma_dct:
-            departure_time = dct.get("departuretime")/1000
-            departure_date.append(datetime.datetime.fromtimestamp(departure_time).strftime('%d/%m/%Y'))
         today_date = datetime.datetime.today().strftime('%d/%m/%Y')
         selected_date = datetime.date.today() + datetime.timedelta(days=1)
         selected_date = selected_date.strftime('%d/%m/%Y')
-        print(today_date)
-        print(selected_date)
+        for dct in roma_dct:
+            departure_time = dct.get("departuretime")/1000
+            departure_date.append(datetime.datetime.fromtimestamp(departure_time).strftime('%d/%m/%Y'))
+            if departure_date[-1] == selected_date:
+                trip.append(dct)
+                trip_price.append(dct.get("minprice"))
+        # print(today_date)
+        # print(selected_date)
         if departure_date[-1] == selected_date:
             n = str(int(n) + 5);
         else:
             i = 1
     else:
         i = 1
+
 print("full trip")
 print(trip)
 print(departure_date)
+print(trip_price)
 # plt.show()
