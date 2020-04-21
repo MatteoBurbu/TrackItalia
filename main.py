@@ -147,5 +147,6 @@ while i == 0:
 print("full trip")
 print(trip)
 print(departure_date)
+
 print(trip_price)
 # plt.show()
