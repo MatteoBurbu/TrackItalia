@@ -110,16 +110,16 @@ for dct in modena_dct:
 #         if price_trip != 0.0:
 #             price.append(price_trip)
 #
-response = requests.get(train_solution_url("ROMA TIBURTINA", "ROMA TERMINI", date="23/04/2020", time="03",offset = "13", is_regional = "true", is_frecce = "false"))
-print("offset 10")
-print(response.text)
+response = requests.get(train_solution_url("ROMA TIBURTINA", "ROMA TERMINI", date="23/04/2020", time="03",offset = "13", is_regional = "false", is_frecce = "true"))
+# print("offset 10")
+# print(response.text)
 # print("min " + str(min(price)))
 # print(price)
 #
 # fig, ax = plt.subplots()  # Create a figure containing a single axes.
 # ax.plot(range(0,len(price)),price)  # Plot some data on the axes.
 
-numdays = 5
+numdays = 180
 base = datetime.datetime.today()
 date_list = [base + datetime.timedelta(days=x) for x in range(numdays)]
 date_lst = []
@@ -129,18 +129,21 @@ for d in date_list:
 url = []
 url_dct = []
 for d in date_lst:
-    print(d)
+    # print(d)
     n = "0"
     trip = []
     trip_price = []
     i = 0
     while i == 0:
-        roma = requests.get(train_solution_url("ROMA TIBURTINA", "ROMA TERMINI", offset=n, date=d, time="03", is_regional = "true", is_frecce = "false"))
+        roma = requests.get(train_solution_url("Bologna centrale", "Roma tiburtina", offset=n, date=d, time="03", is_regional = "false", is_frecce = "true"))
         print(roma)
-        print(n)
+        # print(n)
         # print(roma.json())
         roma_txt = roma.text
         roma_dct = json.loads(roma_txt)
+        if len(roma_dct) == 0:
+            i = 1
+            break
         # trip.append(roma_dct)
         departure_date = []
         today_date = datetime.datetime.today().strftime('%d/%m/%Y')
@@ -148,9 +151,11 @@ for d in date_lst:
         for dct in roma_dct:
             departure_time = dct.get("departuretime")/1000
             departure_date.append(datetime.datetime.fromtimestamp(departure_time).strftime('%d/%m/%Y'))
+            # print(departure_date)
             if departure_date[-1] == selected_date:
                 trip.append(dct)
                 trip_price.append(dct.get("minprice"))
+        # print(departure_date)
         if departure_date[-1] == selected_date and len(roma_dct) == 5:
             n = str(int(n) + 5)
         else:
