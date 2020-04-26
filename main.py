@@ -124,6 +124,8 @@ def train_solution_url(station_start, station_end, ar_flag="A", date="01/01/2020
 # print(price)
 #
 
+prova = 0
+
 # Define the trip
 station_start = "Parma"
 station_end = "Roma Tiburtina"
