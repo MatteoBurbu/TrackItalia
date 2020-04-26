@@ -32,8 +32,14 @@ def train_solution_url(station_start, station_end, ar_flag="A", date="01/01/2020
     station_end = station_end.upper()
     station_start = station_start.split(' ')
     station_end = station_end.split(' ')
-    station_start = station_start[0] + "%20" + station_start[1]
-    station_end = station_end[0] + "%20" + station_end[1]
+    if len(station_start) == 2:
+        station_start = station_start[0] + "%20" + station_start[1]
+    else:
+        station_start = str(station_start[0])
+    if len(station_end) == 2:
+        station_end = station_end[0] + "%20" + station_end[1]
+    else:
+        station_end = str(station_end[0])
     url = "https://www.lefrecce.it/msite/api/solutions?origin=" + station_start + \
           "&destination=" + station_end + \
           "&arflag=" + ar_flag + \
@@ -50,7 +56,6 @@ def train_solution_url(station_start, station_end, ar_flag="A", date="01/01/2020
         url.append("&rdate=" + date_r + "&rtime=" + time_r)
     if freccia_card != "0":
         url.append("&codeList=" + freccia_card)
-    # print(url)
     return url
 
 # s = 1587578460000 / 1000.0
@@ -118,12 +123,10 @@ def train_solution_url(station_start, station_end, ar_flag="A", date="01/01/2020
 # print("min " + str(min(price)))
 # print(price)
 #
-# fig, ax = plt.subplots()  # Create a figure containing a single axes.
-# ax.plot(range(0,len(price)),price)  # Plot some data on the axes.
 
 
 # Define the trip
-station_start = "Bologna Centrale"
+station_start = "Parma"
 station_end = "Roma Tiburtina"
 date_start = datetime.datetime.today()
 date_end = datetime.datetime(2020, 5, 31)
@@ -153,8 +156,13 @@ for d in date_lst:
             # Check for errors on the requests, in that case it repeats the requests
             if return_msg == "<Response [200]>":
                 restart = False
+            elif return_msg == "<Response [400]>":
+                print("Sintax Error")
+                restart = False
+                break
             else:
                 print("Error on " + d)
+                print(trip)
                 restart = True
                 break
             print(return_msg + " " + d)
@@ -173,7 +181,9 @@ for d in date_lst:
                 # Save prices for trips on that day
                 if departure_date[-1] == selected_date:
                     trip_daily_lst.append(dct)
-                    trip_daily_price.append(dct.get("minprice"))
+                    min_price = dct.get("minprice")
+                    if min_price != 0.0:
+                        trip_daily_price.append(min_price)
             # Check if we need to do more requests for that day
             if departure_date[-1] == selected_date and len(trip_dct) == 5:
                 n = str(int(n) + 5)
@@ -182,6 +192,18 @@ for d in date_lst:
         print(trip_daily_price)
         trip_lst.append(trip_daily_lst)
         trip_price.append(trip_daily_price)
+
+price = []
+for lst_price in trip_price:
+    if len(lst_price) != 0:
+        price.append(min(lst_price))
+    else:
+        price.append(0)
+
+fig, ax = plt.subplots()  # Create a figure containing a single axes.
+ax.plot(range(0,len(price)),price)  # Plot some data on the axes.
+print(price)
+plt.show()
 
 # print()
 # print("full trip")
