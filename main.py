@@ -211,9 +211,9 @@ for lst_price in trip_price:
         min_price_lst.append(0)  # 0 on days when no trips are available
 
 for d in idsol_lst:
-    for id in d:
-        details = requests.get("https://www.lefrecce.it/msite/api/solutions/" + id + "standardoffers[?codeFiltered=true]")
-        # print(id)
+    for id_trip in d:
+        details = requests.get("https://www.lefrecce.it/msite/api/solutions/" + id_trip + "standardoffers[?codeFiltered=true]")
+        # print(id_trip)
         print(details.text)
 # print(trip_lst)
 
